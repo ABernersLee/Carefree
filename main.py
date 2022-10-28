@@ -1,4 +1,4 @@
-
+#git version
 
 import dill
 import os
@@ -156,9 +156,12 @@ with map_disp:
         #X need to add a panel with the danger and estimated time DONE
         #X add to the chooseing part DONE
         #X make it zoom into the route DONE
-    # fix the min
+    # fix the time (min) value
+    # make the lines thicker
     # fix the double load problem
     # make the start and end icons be on the nearest nodes
+    # figure out how to have two routes on the map at once
+    # add an in between fast and safe routes
     # make another page with the aspects of the model
         # make page with just the map of danger 
         # havent done hyperparemeter tuning yet
