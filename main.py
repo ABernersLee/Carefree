@@ -144,7 +144,7 @@ with map_disp:
                            st.session_state['route_option'])
     
     st_map = st_folium(st.session_state['m'], width=700, height=500)
-    folium_static(st_map)
+    # folium_static(st_map)
 
     
     
@@ -156,6 +156,7 @@ with map_disp:
         #X need to add a panel with the danger and estimated time DONE
         #X add to the chooseing part DONE
         #X make it zoom into the route DONE
+    # change font color
     # fix the time (min) value
     # make the lines thicker
     # fix the double load problem
