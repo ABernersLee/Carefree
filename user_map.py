@@ -98,10 +98,10 @@ def get_two_routes(gr1, e1, closest_origin_node, closest_target_node):
     return route1, route2, dangr, lngth
 
 
-
+# @st.cache()
 def user_plot(input_orig,input_dest,graph_fit,edges_fit2,m,ro):
 
-    if input_orig=='nan':
+    if input_orig=='nan' or input_dest=='nan':
         return m
     else:
         ##### get the routes from user input and plot
@@ -181,3 +181,21 @@ def default_plot(o,g):
     m = folium.Map((lat,lon),zoom_start=14)
     print('done default')
     return m
+
+def get_m(mdict):
+    if (st.session_state['o'],st.session_state['d'],st.session_state['route_option']) in mdict:
+        print('retreiving',st.session_state['o'],st.session_state['d'],st.session_state['route_option'])
+        return mdict[st.session_state['o'],st.session_state['d'],st.session_state['route_option']]
+    else:
+        if st.session_state['d'] == 'nan':
+            m =  default_plot(st.session_state['o'],st.session_state['g'])
+        else:
+            m =  user_plot(st.session_state['o'],
+                                   st.session_state['d'],
+                                   st.session_state['g'],
+                                   st.session_state['e'],
+                                   st.session_state['m'],
+                                   st.session_state['route_option'])
+        print('adding',st.session_state['o'],st.session_state['d'],st.session_state['route_option'])       
+        mdict[st.session_state['o'],st.session_state['d'],st.session_state['route_option']] = m
+        return m

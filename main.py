@@ -7,7 +7,7 @@ import data_process
 import map_and_model
 import user_map
 import streamlit as st
-from streamlit_folium import st_folium, folium_static
+from streamlit_folium import st_folium #, folium_static
 
 #### Model features
 osm_columns_cat = ['name','osmid','highway','oneway','ref'] 
@@ -125,28 +125,41 @@ with map_search:
         st.write(f'Fastest: {round(dd[0],2)} crashes/km, {ll[0]} min')
         st.write(f'Safest: {round(dd[1],2)} crashes/km, {ll[1]} min')
         
+    print('done with map search')
         
 with map_disp:
     
-    if ('m' not in st.session_state) or (not st.session_state['checked']):
-        st.session_state['o'] = 'nan'
+    if 'mdict' not in st.session_state:
+        mdict = dict()
+        st.session_state['mdict'] = mdict
+    
+    if ('o' not in st.session_state) or (not st.session_state['checked']):
+        st.session_state['o'] = placeholder_orig
         st.session_state['d'] = 'nan'
         st.session_state['g'] = 'nan'
         st.session_state['e'] = 'nan'
-        m = user_map.default_plot(placeholder_orig,graph_fit)
+        # m = user_map.default_plot(placeholder_orig,graph_fit)
+        # m = user_map.default_plot(placeholder_orig,graph_fit)
+        m = user_map.get_m(st.session_state['mdict'])
         st.session_state['m'] = m
+    else:
+        m = user_map.get_m(st.session_state['mdict'])
         
-    st.session_state['m'] = user_map.user_plot(st.session_state['o'],
-                           st.session_state['d'],
-                           st.session_state['g'],
-                           st.session_state['e'],
-                           st.session_state['m'],
-                           st.session_state['route_option'])
+    # st.session_state['m'] = user_map.user_plot(st.session_state['o'],
+    #                        st.session_state['d'],
+    #                        st.session_state['g'],
+    #                        st.session_state['e'],
+    #                        st.session_state['m'],
+    #                        st.session_state['route_option'])
+    # m = get_m(st.session_state['d'],mdict,st.session_state)
     
-    st_map = st_folium(st.session_state['m'], width=700, height=500)
+    # st_map = st_folium(st.session_state['m'], width=700, height=500)
+    st_map = st_folium(m, width=700, height=500)
     # folium_static(st_map)
-
+    print('done with map disp')
     
+ 
+
     
     
 ### issues:
