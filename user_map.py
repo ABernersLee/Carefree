@@ -67,6 +67,15 @@ def reformat_orgin_dest(origin, destination, graph_fit, edges_fit):
 #         print(closest_target_node in graph_proj)
     return closest_origin_node, closest_target_node
 
+def get_weight_of_route(route,edg):
+    safe_X= 0
+    short_X = 0
+    for x in range(len(route)-1):
+        lk = edg.loc[route[x],route[x+1]]
+        safe_X += lk['cpk2'][0]
+        short_X += lk['length'][0]
+    #total length, average danger
+    return safe_X/len(route), short_X
 
 def get_two_routes(gr1, e1, closest_origin_node, closest_target_node):
     
@@ -78,23 +87,32 @@ def get_two_routes(gr1, e1, closest_origin_node, closest_target_node):
     route1 = nx.shortest_path(G = gr, 
                             source=closest_origin_node, 
                             target=closest_target_node, weight='length')
+    # short1 = nx.shortest_path_length(G = gr, 
+    #                         source=closest_origin_node, 
+    #                         target=closest_target_node, weight='length')
     
     route2 = nx.shortest_path(G = gr, 
                             source=closest_origin_node, 
                             target=closest_target_node, weight='cpk2')
+    # safe1 = nx.shortest_path_length(G = gr, 
+    #                         source=closest_origin_node, 
+    #                         target=closest_target_node, weight='cpk2')
+
+
+    safeX,shortX = get_weight_of_route(route1,e)
+    safeY,shortY = get_weight_of_route(route2,e)
 
     # get the danger of these routes
-    dangr = []
-    lngth = []
-    route1_edges = e.loc[route1]
-    # print(route1_edges["length"].describe())
-    dangr.append(float(route1_edges["cpk2"].median()))
-    lngth.append(float(route1_edges["length"].sum()))
-    route2_edges = e.loc[route2]
-    # print(route2_edges["length"].describe())
-    dangr.append(float(route2_edges["cpk2"].median()))
-    lngth.append(float(route2_edges["length"].sum()))
+    # from crashes/km *(km/route) to crashes/route
+        # to crashes/year in this route (20 years of data)
+    dangr = [(safeX*(shortX/1000))/20, (safeY*(shortY/1000))/20]
+    meters_per_min = 217
+    #from meters to min
+    lngth = [shortX/meters_per_min, shortY/meters_per_min]
     
+    # print(dangr,type(dangr))
+    # print(shortX,short1)
+    # print(safeY,safe1)
     return route1, route2, dangr, lngth
 
 
@@ -102,7 +120,7 @@ def get_two_routes(gr1, e1, closest_origin_node, closest_target_node):
 def user_plot(input_orig,input_dest,graph_fit,edges_fit2,m,ro):
 
     if input_orig=='nan' or input_dest=='nan':
-        return m
+        return m, 'nan','nan'
     else:
         ##### get the routes from user input and plot
     
@@ -128,7 +146,9 @@ def user_plot(input_orig,input_dest,graph_fit,edges_fit2,m,ro):
                                      color='#3388ff',
                                      opacity=0.7,
                                      tiles='openstreetmap',
-                                     tooltip = f'Fastest: {round(dangr[0],2)} crashes/km, {lngth[0]} min',
+                                     tooltip = f'Fastest: {round(lngth[0],1)} min route with {round(dangr[0],1)} crashes/year'
+                                     # f'Fastest: {round(dangr[0],2)} crashes/km, {lngth[0]} min',
+                                     
                                      # popup = f'Fastest: {round(dangr[0],2)} crashes/km, {lngth[0]} min',
                                      ).add_to(m)
         elif ro=='Safest':
@@ -137,7 +157,8 @@ def user_plot(input_orig,input_dest,graph_fit,edges_fit2,m,ro):
                                      color='#EE4B2B',
                                      opacity=0.7,
                                      tiles='openstreetmap',
-                                     tooltip = f'Safest: {round(dangr[1],2)} crashes/km, {lngth[1]} min',
+                                     tooltip = f'Safest: {round(lngth[1],1)} min route with {round(dangr[1],1)} crashes/year'
+                                     # f'Safest: {round(dangr[1],2)} crashes/km, {lngth[1]} min',
                                      # popup = f'Safest: {round(dangr[1],2)} crashes/km, {lngth[1]} min',
                                      ).add_to(m)
                 
@@ -158,15 +179,15 @@ def user_plot(input_orig,input_dest,graph_fit,edges_fit2,m,ro):
         start_marker.add_to(m)
         end_marker.add_to(m)
 
-        if 'dangr' not in st.session_state or st.session_state['dangr']!=dangr:
-            print('update this')
-            st.session_state['dangr'] = dangr
-            st.session_state['lngth'] = lngth
+        # if 'dangr' not in st.session_state or st.session_state['dangr']!=dangr:
+        #     print('update this')
+        #     st.session_state['dangr'] = dangr
+        #     st.session_state['lngth'] = lngth
         
         
         print('done user_map')
         
-        return m 
+        return m, dangr, lngth
 
 
 def change_map(o,d,g,e):
@@ -180,22 +201,29 @@ def default_plot(o,g):
     lat, lon = get_lat_lon(o)
     m = folium.Map((lat,lon),zoom_start=14)
     print('done default')
-    return m
+    return m, 'nan','nan'
 
 def get_m(mdict):
     if (st.session_state['o'],st.session_state['d'],st.session_state['route_option']) in mdict:
         print('retreiving',st.session_state['o'],st.session_state['d'],st.session_state['route_option'])
-        return mdict[st.session_state['o'],st.session_state['d'],st.session_state['route_option']]
+        m, dangr, lngth =  mdict[st.session_state['o'],st.session_state['d'],st.session_state['route_option']]
+        # print(it)
+        # m,dangr,lngth = 
+        st.session_state['dangr'] = dangr
+        st.session_state['lngth'] = lngth
+        return m
     else:
         if st.session_state['d'] == 'nan':
-            m =  default_plot(st.session_state['o'],st.session_state['g'])
+            m,dangr,lngth =  default_plot(st.session_state['o'],st.session_state['g'])
         else:
-            m =  user_plot(st.session_state['o'],
+            m,dangr,lngth =  user_plot(st.session_state['o'],
                                    st.session_state['d'],
                                    st.session_state['g'],
                                    st.session_state['e'],
                                    st.session_state['m'],
                                    st.session_state['route_option'])
         print('adding',st.session_state['o'],st.session_state['d'],st.session_state['route_option'])       
-        mdict[st.session_state['o'],st.session_state['d'],st.session_state['route_option']] = m
+        mdict[st.session_state['o'],st.session_state['d'],st.session_state['route_option']] = m, dangr, lngth
+        st.session_state['dangr'] = dangr
+        st.session_state['lngth'] = lngth
         return m

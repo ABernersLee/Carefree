@@ -22,8 +22,7 @@ placeholder_orig = '18 Oxford St, Somerville, MA'
 placeholder_dest = '92 Pearson Rd, Somerville, MA'
 
 
-
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide",page_title='Carefree', page_icon=":bike:")
 _,_,header = st.columns([1,2,5])
 _,header2 = st.columns([1,3])
 map_search,map_disp = st.columns(2)
@@ -122,8 +121,8 @@ with map_search:
     if 'dangr' in st.session_state and st.session_state['dangr']!='nan':
         dd = st.session_state['dangr']
         ll = st.session_state['lngth']
-        st.write(f'Fastest: {round(dd[0],2)} crashes/km, {ll[0]} min')
-        st.write(f'Safest: {round(dd[1],2)} crashes/km, {ll[1]} min')
+        st.write(f'Fastest: {round(ll[0],1)} min route with {round(dd[0],1)} crashes/year')
+        st.write(f'Safest: {round(ll[1],1)} min route with {round(dd[1],1)} crashes/year')
         
     print('done with map search')
         
@@ -133,7 +132,7 @@ with map_disp:
         mdict = dict()
         st.session_state['mdict'] = mdict
     
-    if ('o' not in st.session_state) or (not st.session_state['checked']):
+    if ('o' not in st.session_state): #or (not st.session_state['checked']):
         st.session_state['o'] = placeholder_orig
         st.session_state['d'] = 'nan'
         st.session_state['g'] = 'nan'
