@@ -63,7 +63,6 @@ def get_edges_nodes():
 
 
 #### load crash data
-@st.experimental_memo
 def get_crash_data():
     path = r'/Users/alicebernerslee/Desktop/capstone_streamlit/data' # use your path
     all_files = glob.glob(os.path.join(path, "*_Details.csv"))
@@ -82,16 +81,17 @@ def get_crash_data():
         dat1 = dat1[SM]
         dat = pd.concat([dat,dat1], ignore_index=True)
 
-    
-    # make crashes into geoframes
-        # https://geopandas.org/en/stable/gallery/create_geopandas_from_pandas.html
-    sm_crashes2g = gpd.GeoDataFrame(dat, geometry=gpd.points_from_xy(dat.LON, dat.LAT), crs=4326)
-    return sm_crashes2g
+    return dat
 
 
 
 @st.cache
-def merge_crash_streets(sm_crashes2g, edges):
+def merge_crash_streets(dat, edges):
+    
+    # make crashes into geoframes
+        # https://geopandas.org/en/stable/gallery/create_geopandas_from_pandas.html
+    sm_crashes2g = gpd.GeoDataFrame(dat, geometry=gpd.points_from_xy(dat.LON, dat.LAT), crs=4326)
+    
     # convert both to meters
     crash1 = sm_crashes2g.to_crs(3857)
     streets1 = edges.to_crs(3857)
@@ -167,7 +167,7 @@ def make_graph_proj(edges, nodes, merged_edges, test_size = .5):
      # Reproject the graph
     graph_proj = ox.project_graph(graph2)
     
-    # only use half of the crashes to build out this ?
+    # only use half of the crashes to build out this
     edges3 = ox.graph_to_gdfs(graph_proj, nodes=False)
     rs = ShuffleSplit(n_splits=1, test_size=test_size, random_state=0)
     rsx = rs.split(range(len(edges3)))

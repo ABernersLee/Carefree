@@ -23,6 +23,8 @@ placeholder_dest = '92 Pearson Rd, Somerville, MA'
 
 
 st.set_page_config(layout="wide",page_title='Carefree', page_icon=":bike:")
+# st.sidebar.markdown("# Map and routes")
+
 _,_,header = st.columns([1,2,5])
 _,header2 = st.columns([1,3])
 map_search,map_disp = st.columns(2)
@@ -48,9 +50,9 @@ else:
     print('getting data')
     edges,nodes = data_process.get_edges_nodes()
     print('done get edges nodes')
-    sm_crashes2g = data_process.get_crash_data()
+    dat = data_process.get_crash_data()
     print('done get crash data')
-    crash_streets = data_process.merge_crash_streets(sm_crashes2g, edges)
+    crash_streets = data_process.merge_crash_streets(dat, edges)
     print('done getting data')
     
     # get crash estimate
@@ -162,26 +164,39 @@ with map_disp:
     
     
 ### issues:
-    #X plot on a better map instead of an image DONE
-        #X got one route working, need to get the others DONE
-        #X needs to change between DONE
-        #X need to add a panel with the danger and estimated time DONE
-        #X add to the chooseing part DONE
-        #X make it zoom into the route DONE
-    # change font color
-    # fix the time (min) value
-    # make the lines thicker
-    # fix the double load problem
-    # make the start and end icons be on the nearest nodes
-    # figure out how to have two routes on the map at once
-    # add an in between fast and safe routes
-    # make another page with the aspects of the model
-        # make page with just the map of danger 
-        # havent done hyperparemeter tuning yet
-            # do the edges to nodes for faster algorithm
-        # havent brought in other features of streets
-    # both of those issues are because of overlapping streets:
-        # get better estimate of length
-        # convert length to estimated time
-        # using the median right now instead of the mean for danger
+    
+#X plot on a better map instead of an image DONE
+    #X got one route working, need to get the others DONE
+    #X needs to change between DONE
+    #X need to add a panel with the danger and estimated time DONE
+    #X add to the chooseing part DONE
+    #X make it zoom into the route DONE
+#Xfix the time (min) value DONE
+#Xfix the double load problem DONE
+#Xboth of those issues are because of overlapping streets: DONE
+    #Xget better estimate of length DONE
+    #Xconvert length to estimated time DONE
+    #Xusing the median right now instead of the mean for danger
+#Xfind normalizing data (city of somerville)
+#Xmake tab of website for the model
+# save out an earlier version of the data so you can make changes with the model
+# hyper-parameter tuning
+# cross-validation metrics
+# add ReadMe and update requirements
+# put online
+
+# fix node issue
+# add normalizing data
+# add more features (bike lanes?)
+# add elevation (srtm elevation data)
+# make the start and end icons be on the nearest nodes
+# figure out how to have two routes on the map at once
+# add an in between fast and safe routes
+# make another page with the aspects of the model
+    # make page with just the map of danger 
+    # havent done hyperparemeter tuning yet
+        # do the edges to nodes for faster algorithm
+    # havent brought in other features of streets
+# change font color
+# make the lines thicker
     # add cambridge and medford

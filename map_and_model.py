@@ -98,7 +98,7 @@ def merge_new_var_in(edges3, st_num):
                               suffixes = ['','_y'])
     return new_st_num
 
-@st.cache
+
 def make_fit_model(new_st_num,categorical_columns,osm_columns_cat,numeric_columns,osm_columns_num):
     
     #### model
@@ -121,7 +121,7 @@ def make_fit_model(new_st_num,categorical_columns,osm_columns_cat,numeric_column
     # print(f'Train on 80%, test on 20%: R^2 = {round(r2,3)}')
     return est
 
-@st.cache
+
 def predict_map(new_st_num,edges3,est,categorical_columns,osm_columns_cat,numeric_columns,osm_columns_num):
     
     edges_fit = data_process.get_merged_edges(new_st_num,edges3,categorical_columns,osm_columns_cat,numeric_columns,osm_columns_num)
